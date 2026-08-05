@@ -1,459 +1,774 @@
 <!doctype html>
-
-<html class="light" lang="en">
+<html class="dark" lang="en">
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Vault Radiology — CheXpert AI Diagnostic Engine</title>
+    <meta name="description" content="Medical-grade AI diagnostic engine for multi-label chest X-Ray pathology detection using DenseNet121." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;700;800&amp;family=Inter:wght@300;400;600&amp;display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
       rel="stylesheet"
     />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script id="tailwind-config">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
       tailwind.config = {
         darkMode: "class",
         theme: {
           extend: {
             colors: {
-              "on-primary-fixed-variant": "#1f477b",
-              "inverse-primary": "#a7c8ff",
-              "inverse-surface": "#2d3133",
-              surface: "#f7f9fb",
-              "surface-container-highest": "#e0e3e5",
-              "secondary-container": "#d5e3fc",
-              "on-tertiary-container": "#d8885c",
-              "surface-container-low": "#f2f4f6",
-              "on-tertiary-fixed-variant": "#723610",
-              primary: "#001e40",
-              "tertiary-fixed-dim": "#ffb690",
-              "secondary-fixed-dim": "#b9c7df",
-              "on-secondary-fixed-variant": "#3a485b",
-              "tertiary-fixed": "#ffdbca",
-              "surface-container-high": "#e6e8ea",
-              background: "#f7f9fb",
-              "tertiary-container": "#592300",
-              "surface-container": "#eceef0",
-              "on-secondary-container": "#57657a",
-              "inverse-on-surface": "#eff1f3",
-              "on-secondary": "#ffffff",
-              tertiary: "#381300",
-              "on-error-container": "#93000a",
-              "surface-container-lowest": "#ffffff",
-              "primary-fixed": "#d5e3ff",
-              "on-surface": "#191c1e",
-              "on-error": "#ffffff",
-              "on-secondary-fixed": "#0d1c2e",
-              "on-primary-fixed": "#001b3c",
-              "surface-dim": "#d8dadc",
-              "on-tertiary-fixed": "#341100",
-              secondary: "#515f74",
-              "on-primary": "#ffffff",
-              "outline-variant": "#c3c6d1",
-              "error-container": "#ffdad6",
-              "on-tertiary": "#ffffff",
-              "surface-tint": "#3a5f94",
-              outline: "#737780",
-              "primary-container": "#003366",
-              "on-primary-container": "#799dd6",
-              "primary-fixed-dim": "#a7c8ff",
-              "on-surface-variant": "#43474f",
-              error: "#ba1a1a",
-              "secondary-fixed": "#d5e3fc",
-              "surface-bright": "#f7f9fb",
-              "on-background": "#191c1e",
-              "surface-variant": "#e0e3e5",
-            },
-            borderRadius: {
-              DEFAULT: "0.125rem",
-              lg: "0.25rem",
-              xl: "0.5rem",
-              full: "0.75rem",
+              vault: {
+                bg: "#080c14",
+                card: "#0f1623",
+                cardBorder: "#1b2538",
+                cardHover: "#151f32",
+                accent: "#38bdf8",
+                accentGlow: "rgba(56, 189, 248, 0.15)",
+                amber: "#f59e0b",
+                amberGlow: "rgba(245, 158, 11, 0.15)",
+                muted: "#64748b",
+                text: "#94a3b8",
+                heading: "#f8fafc",
+              },
             },
             fontFamily: {
-              headline: ["Manrope"],
-              body: ["Inter"],
-              label: ["Inter"],
+              sans: ["Inter", "sans-serif"],
+              mono: ["JetBrains Mono", "monospace"],
             },
           },
         },
       };
     </script>
     <style>
-      .material-symbols-outlined {
-        font-variation-settings:
-          "FILL" 0,
-          "wght" 400,
-          "GRAD" 0,
-          "opsz" 24;
+      body {
+        background-color: #080c14;
+        color: #94a3b8;
+        background-image: 
+          radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.05) 0%, transparent 60%),
+          radial-gradient(circle at 85% 30%, rgba(245, 158, 11, 0.03) 0%, transparent 50%);
+        min-height: 100vh;
       }
-      .glass-nav {
-        background: rgba(255, 255, 255, 0.8);
-        backdrop-filter: blur(16px);
+      .glass-panel {
+        background: rgba(15, 22, 35, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid #1b2538;
+      }
+      .glow-box-cyan {
+        box-shadow: 0 0 25px -5px rgba(56, 189, 248, 0.2);
+      }
+      .glow-box-amber {
+        box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.2);
+      }
+      /* Custom Segmented Bar */
+      .segmented-bar {
+        display: flex;
+        gap: 3px;
+      }
+      .segment-block {
+        height: 10px;
+        flex: 1;
+        background-color: #162032;
+        border-radius: 1px;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      }
+      .segment-block.active-amber {
+        background-color: #f59e0b;
+        box-shadow: 0 0 6px rgba(245, 158, 11, 0.6);
+      }
+      .segment-block.active-cyan {
+        background-color: #38bdf8;
+        box-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
+      }
+      .segment-block.active-muted {
+        background-color: #334155;
+      }
+      /* Bounding Overlay Pulse */
+      .pathology-highlight {
+        position: absolute;
+        border: 2px dashed #f59e0b;
+        background: rgba(245, 158, 11, 0.12);
+        border-radius: 50%;
+        animation: pulse-ring 2s infinite ease-in-out;
+      }
+      @keyframes pulse-ring {
+        0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+        70% { box-shadow: 0 0 0 12px rgba(245, 158, 11, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+      }
+      /* Grid background lines for DICOM feel */
+      .dicom-grid {
+        background-image: 
+          linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        background-size: 20px 20px;
+      }
+      /* Scrollbar Customization */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0d131f;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #1e293b;
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #334155;
       }
     </style>
   </head>
-  <body
-    class="bg-surface text-on-surface font-body selection:bg-primary-fixed selection:text-on-primary-fixed"
-  >
-    <!-- Top Navigation Bar -->
-    <nav
-      class="fixed top-0 z-50 w-full glass-nav shadow-[0_32px_64px_-15px_rgba(0,0,0,0.05)]"
-    >
-      <div
-        class="flex justify-between items-center w-full px-8 py-6 max-w-screen-2xl mx-auto"
-      >
-        <div
-          class="text-2xl font-black tracking-tighter text-[#001e40] uppercase font-headline"
-        >
-          Vault AI
+  <body class="font-sans antialiased selection:bg-sky-900 selection:text-sky-100 min-h-screen flex flex-col justify-between">
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-vault-cardBorder">
+      <div class="max-w-screen-2xl mx-auto px-6 h-16 flex items-center justify-between">
+        
+        <!-- Brand & Subtitle -->
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-sky-950 border border-sky-500/40 flex items-center justify-center text-sky-400 font-mono text-sm font-bold shadow-sm">
+            ⚡
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-slate-100 tracking-tight text-base">Vault Radiology</span>
+            </div>
+            <p class="text-[10px] font-mono text-vault-accent tracking-widest uppercase font-semibold">CHEXPERT INFERENCE</p>
+          </div>
         </div>
-        <div class="hidden md:flex items-center space-x-10">
-          <a
-            class="font-headline font-bold tracking-[-0.02em] text-[#57657a] hover:text-[#001e40] transition-colors"
-            href="ChestXray.html"
-            >ChestXray</a
-          >
-          <a
-            class="font-headline font-bold tracking-[-0.02em] text-[#001e40] border-b-2 border-[#001e40] pb-1"
-            href="chexpert.html"
-            >CheXpert</a
-          >
-          <a
-            class="font-headline font-bold tracking-[-0.02em] text-[#57657a] hover:text-[#001e40] transition-colors"
-            href="#"
-            >Research</a
-          >
+
+        <!-- Navigation Tabs -->
+        <nav class="hidden md:flex items-center space-x-1">
+          <button id="navReadingRoom" class="px-4 py-2 text-xs font-mono font-semibold text-sky-400 border-b-2 border-sky-400 transition-all">
+            Reading Room
+          </button>
+          <button id="navCaseHistory" class="px-4 py-2 text-xs font-mono font-medium text-slate-400 hover:text-slate-200 transition-all">
+            Case History
+          </button>
+          <a href="/docs" target="_blank" class="px-4 py-2 text-xs font-mono font-medium text-slate-400 hover:text-slate-200 transition-all flex items-center gap-1">
+            API Docs <span class="material-symbols-outlined text-xs">open_in_new</span>
+          </a>
+          <button id="navModelCard" class="px-4 py-2 text-xs font-mono font-medium text-slate-400 hover:text-slate-200 transition-all">
+            Model Card
+          </button>
+        </nav>
+
+        <!-- Right Side Telemetry Badge -->
+        <div class="flex items-center space-x-3">
+          <div id="serverBadge" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/90 border border-emerald-500/30 text-xs font-mono text-emerald-400">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" id="serverDot"></span>
+            <span id="serverText" class="text-[11px]">DenseNet121 - Online</span>
+          </div>
         </div>
-        <button
-          class="bg-gradient-to-r from-primary to-primary-container text-white px-6 py-2.5 rounded-lg text-sm font-semibold tracking-wider uppercase hover:opacity-90 transition-all"
-        >
-          Access Portal
-        </button>
       </div>
-    </nav>
+    </header>
 
-    <main class="pt-32 pb-24">
-      <!-- Hero Section -->
-      <section
-        class="max-w-screen-2xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 items-end mb-32"
-      >
-        <div class="lg:col-span-7">
-          <span
-            class="inline-block px-3 py-1 mb-6 rounded-full bg-secondary-container text-on-secondary-fixed-variant text-xs font-bold tracking-widest uppercase"
-            >CheXpert Pathology Detection</span
-          >
-          <h1
-            class="text-5xl md:text-7xl font-headline font-extrabold text-primary tracking-[-0.03em] leading-tight mb-8"
-          >
-            ChestXray <br />
-            AI Model
-          </h1>
-          <p
-            class="text-xl text-on-surface-variant max-w-2xl leading-relaxed font-light"
-          >
-            Advanced multi-label classification for comprehensive chest X-ray
-            analysis. Trained on the CheXpert dataset with state-of-the-art
-            performance across 14 pathology classes.
-          </p>
-        </div>
-        <div class="lg:col-span-5 flex flex-col items-end">
-          <div class="text-right mb-6">
-            <div class="text-6xl font-headline font-black text-primary">
-              96.2%
-            </div>
-            <div
-              class="text-sm font-semibold text-outline tracking-widest uppercase"
-            >
-              Average Accuracy
-            </div>
-          </div>
-          <div class="h-2 w-full bg-primary-fixed rounded-full">
-            <div class="h-full w-[96.2%] bg-primary rounded-full"></div>
-          </div>
-        </div>
-      </section>
+    <!-- Main Workspace Container -->
+    <main class="max-w-screen-2xl mx-auto px-6 py-6 flex-grow w-full space-y-6">
 
-      <!-- Interactive Demo Section -->
-      <section class="max-w-screen-2xl mx-auto px-8 mb-32">
-        <div class="bg-surface-container-low rounded-xl p-12 relative">
-          <div class="text-center mb-8">
-            <h2 class="text-3xl font-headline font-bold text-primary mb-4">
-              CheXpert Inference Engine
-            </h2>
-            <p class="text-on-surface-variant max-w-2xl mx-auto">
-              Upload a chest X-ray image for AI-powered multi-label pathology
-              detection across 14 conditions
+      <!-- Hero Header & Model Status Widget Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        
+        <!-- Left Hero Text -->
+        <div class="lg:col-span-8 flex flex-col justify-between py-2">
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="h-0.5 w-6 bg-vault-accent inline-block"></span>
+              <span class="text-[11px] font-mono text-slate-400 font-semibold tracking-wider uppercase">
+                DENSENET-121 · 14-CLASS MULTI-LABEL · CHEXPERT WEIGHTS
+              </span>
+            </div>
+            <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight mb-3">
+              Chest X-Ray, read <br class="hidden sm:block" />at <span class="text-vault-accent">machine speed.</span>
+            </h1>
+            <p class="text-sm text-slate-400 max-w-2xl leading-relaxed font-normal">
+              Upload a frontal chest radiograph and get calibrated probability scores across 14 thoracic pathologies — the same label set radiologists use to structure a reading, returned in under a second.
             </p>
           </div>
 
-          <div class="flex flex-col items-center gap-8">
-            <!-- Upload Area -->
-            <div
-              id="chexpertUploadArea"
-              class="w-full max-w-md h-48 bg-white rounded-xl border-2 border-dashed border-outline-variant cursor-pointer hover:border-primary transition-colors flex flex-col items-center justify-center"
-            >
-              <span class="material-symbols-outlined text-5xl text-outline mb-2"
-                >medical_information</span
-              >
-              <span
-                class="text-sm font-bold text-outline uppercase tracking-wider"
-                >Drop X-Ray Here or Click</span
-              >
-              <input
-                type="file"
-                id="chexpertFileInput"
-                accept="image/*"
-                style="display: none"
-              />
+          <!-- Quick Stats Row -->
+          <div class="grid grid-cols-3 gap-6 pt-6 border-t border-vault-cardBorder/60 max-w-xl mt-4">
+            <div>
+              <div class="text-xl font-bold font-mono text-white">14</div>
+              <div class="text-[10px] font-mono text-slate-500 uppercase tracking-wider mt-0.5">PATHOLOGY CLASSES</div>
             </div>
-
-            <!-- Prediction Result -->
-            <div
-              id="chexpertPredictionResult"
-              style="display: none"
-              class="w-full max-w-2xl bg-white p-8 rounded-lg shadow-lg"
-            >
-              <h3 class="text-lg font-bold text-primary mb-4">
-                Detection Results
-              </h3>
-              <p
-                id="chexpertPredictionText"
-                class="text-xl font-semibold text-primary mb-2"
-              ></p>
-              <p
-                id="chexpertConfidenceText"
-                class="text-sm text-on-surface-variant mb-4"
-              ></p>
-              <div
-                class="w-full h-3 bg-surface-container-high rounded-full overflow-hidden mb-6"
-              >
-                <div
-                  id="chexpertConfidenceBar"
-                  class="h-full bg-primary"
-                  style="width: 0%"
-                ></div>
-              </div>
-
-              <!-- All Predictions Table -->
-              <div
-                id="chexpertAllPredictions"
-                style="display: none"
-                class="mt-6"
-              >
-                <h4 class="font-bold text-primary mb-3">
-                  All Detections (Confidence ≥ 50%)
-                </h4>
-                <div class="overflow-x-auto">
-                  <table class="w-full text-sm">
-                    <thead class="bg-surface-container-low">
-                      <tr>
-                        <th class="px-4 py-2 text-left font-bold text-primary">
-                          Pathology
-                        </th>
-                        <th class="px-4 py-2 text-right font-bold text-primary">
-                          Confidence
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody id="chexpertPredictionTable"></tbody>
-                  </table>
-                </div>
-              </div>
+            <div>
+              <div class="text-xl font-bold font-mono text-white">&lt;0.4s</div>
+              <div class="text-[10px] font-mono text-slate-500 uppercase tracking-wider mt-0.5">AVG. INFERENCE</div>
+            </div>
+            <div>
+              <div class="text-xl font-bold font-mono text-white">224²</div>
+              <div class="text-[10px] font-mono text-slate-500 uppercase tracking-wider mt-0.5">INPUT RESOLUTION</div>
             </div>
           </div>
         </div>
-      </section>
 
-      <!-- Pathology Information -->
-      <section class="bg-surface-container-low py-32">
-        <div class="max-w-screen-2xl mx-auto px-8">
-          <h2 class="text-3xl font-headline font-bold text-primary mb-8">
-            Pathology Classes
-          </h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-white p-6 rounded-lg">
-              <h3 class="font-bold text-primary mb-3">Primary Conditions</h3>
-              <ul class="text-sm text-on-surface-variant space-y-2">
-                <li>• Atelectasis</li>
-                <li>• Cardiomegaly</li>
-                <li>• Consolidation</li>
-                <li>• Edema</li>
-                <li>• Effusion</li>
-                <li>• Emphysema</li>
-                <li>• Fibrosis</li>
-              </ul>
-            </div>
-            <div class="bg-white p-6 rounded-lg">
-              <h3 class="font-bold text-primary mb-3">Secondary Conditions</h3>
-              <ul class="text-sm text-on-surface-variant space-y-2">
-                <li>• Hernia</li>
-                <li>• Infiltration</li>
-                <li>• Nodule</li>
-                <li>• Pleural Thickening</li>
-                <li>• Pneumonia</li>
-                <li>• Pneumothorax</li>
-                <li>• No Finding</li>
-              </ul>
+        <!-- Right Side Model Status Telemetry Gauge Card -->
+        <div class="lg:col-span-4 bg-vault-card border border-vault-cardBorder rounded-2xl p-5 flex flex-col justify-between relative overflow-hidden">
+          <div class="flex justify-between items-center border-b border-vault-cardBorder/60 pb-3 mb-2">
+            <span class="text-[10px] font-mono font-bold uppercase text-slate-400 tracking-wider">MODEL STATUS</span>
+            <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950/80 border border-emerald-500/30 px-2 py-0.5 rounded">ACTIVE</span>
+          </div>
+
+          <!-- Speedometer / Arc Gauge -->
+          <div class="flex flex-col items-center justify-center my-2 relative">
+            <svg class="w-44 h-24" viewBox="0 0 100 55">
+              <!-- Gauge background arc -->
+              <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#1b2538" stroke-width="8" stroke-linecap="round" />
+              <!-- Active cyan arc -->
+              <path d="M 10 50 A 40 40 0 0 1 78 22" fill="none" stroke="#38bdf8" stroke-width="8" stroke-linecap="round" stroke-dasharray="100" stroke-dashoffset="0" />
+              <!-- Gauge needle -->
+              <line x1="50" y1="50" x2="68" y2="24" stroke="#f8fafc" stroke-width="2.5" stroke-linecap="round" />
+              <circle cx="50" cy="50" r="4" fill="#38bdf8" />
+            </svg>
+            <div class="text-center -mt-2">
+              <span class="text-base font-bold font-mono text-white block">Nominal</span>
+              <span class="text-[11px] font-mono text-slate-400">GPU 0 - 2.8GB / 16GB</span>
             </div>
           </div>
+
+          <!-- Gauge Footer Info -->
+          <div class="flex justify-between items-center text-[10px] font-mono text-slate-400 border-t border-vault-cardBorder/60 pt-3">
+            <span>Uptime <strong class="text-slate-200">99.98%</strong></span>
+            <span>Queue <strong class="text-slate-200">0</strong></span>
+          </div>
         </div>
-      </section>
+      </div>
+
+      <!-- Main Interactive Workbench Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left Column: Film Viewer Card -->
+        <div class="lg:col-span-6 bg-vault-card border border-vault-cardBorder rounded-2xl p-5 flex flex-col justify-between space-y-4">
+          
+          <!-- Card Header -->
+          <div class="flex justify-between items-center border-b border-vault-cardBorder/80 pb-3">
+            <span class="text-xs font-mono font-bold text-slate-300">Film Viewer</span>
+            <span class="text-[11px] font-mono text-slate-400" id="studyMetadataText">STUDY / 2026-08-05 / PA</span>
+          </div>
+
+          <!-- Radiograph Viewer Area -->
+          <div
+            id="dropZoneArea"
+            class="relative w-full h-[380px] bg-slate-950 rounded-xl border border-vault-cardBorder dicom-grid flex flex-col items-center justify-center cursor-pointer group overflow-hidden transition-all duration-200"
+          >
+            <!-- Blank State Prompt -->
+            <div id="blankPrompt" class="flex flex-col items-center text-center p-6 space-y-3">
+              <div class="w-14 h-14 rounded-full bg-slate-900 border border-vault-cardBorder group-hover:border-sky-500/50 flex items-center justify-center text-sky-400 transition-colors">
+                <span class="material-symbols-outlined text-2xl">add_photo_alternate</span>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-slate-200 mb-1">Upload Radiograph DICOM / Image</h3>
+                <p class="text-xs text-slate-400">Drag & drop chest scan or click to browse</p>
+              </div>
+              
+              <!-- Sample Preset Buttons -->
+              <div class="pt-2 flex gap-2">
+                <button type="button" class="sample-preset-btn px-2.5 py-1 text-[10px] font-mono bg-slate-900 border border-slate-700 hover:border-sky-400 text-slate-300 rounded transition-all" data-sample="pneumonia">
+                  Sample: Pneumonia
+                </button>
+                <button type="button" class="sample-preset-btn px-2.5 py-1 text-[10px] font-mono bg-slate-900 border border-slate-700 hover:border-sky-400 text-slate-300 rounded transition-all" data-sample="normal">
+                  Sample: Normal
+                </button>
+              </div>
+            </div>
+
+            <!-- Image Canvas / Preview -->
+            <img id="xrayPreview" class="hidden absolute inset-0 w-full h-full object-contain p-4 bg-slate-950" alt="Chest Radiograph Preview" />
+
+            <!-- DICOM Technical Corners Overlay -->
+            <div class="absolute top-3 left-3 font-mono text-[9px] text-slate-400 pointer-events-none select-none">
+              <div id="dicomIdTag">RX-8294 · AP · 224x224</div>
+            </div>
+            <div class="absolute top-3 right-3 font-mono text-[9px] text-slate-400 pointer-events-none select-none">
+              CHEXPERT GRID
+            </div>
+
+            <!-- Dynamic Pathology Highlight Box (Appears after prediction) -->
+            <div id="pathologyOverlay" class="hidden pathology-highlight" style="top: 42%; left: 52%; width: 90px; height: 90px;">
+              <span class="absolute -top-5 left-0 text-[9px] font-mono font-bold bg-amber-500 text-slate-950 px-1 rounded" id="overlayLabel">PRIMARY · PNE</span>
+            </div>
+
+            <input type="file" id="fileInput" accept="image/*" class="hidden" />
+          </div>
+
+          <!-- Image File Footer Bar -->
+          <div class="flex justify-between items-center bg-slate-950/80 px-3.5 py-2.5 rounded-lg border border-vault-cardBorder text-xs font-mono">
+            <div class="flex items-center gap-2 truncate max-w-[280px]">
+              <span class="w-2 h-2 rounded-full bg-slate-600" id="fileDot"></span>
+              <span class="text-slate-300 truncate" id="fileNameText">no_study_loaded.dcm</span>
+            </div>
+            <button id="changeStudyBtn" class="text-[11px] text-sky-400 hover:underline">Change Study</button>
+          </div>
+
+          <!-- Analyze Action Button -->
+          <button
+            id="runAnalysisBtn"
+            disabled
+            class="w-full py-3.5 px-4 bg-sky-500 hover:bg-sky-400 disabled:bg-slate-800 disabled:text-slate-600 text-slate-950 font-mono font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg glow-box-cyan flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
+          >
+            <span class="material-symbols-outlined text-base" id="btnIcon">bolt</span>
+            <span id="btnText">Select Radiograph to Run</span>
+          </button>
+        </div>
+
+        <!-- Right Column: Pathology Report Card -->
+        <div class="lg:col-span-6 bg-vault-card border border-vault-cardBorder rounded-2xl p-5 flex flex-col justify-between space-y-4">
+          
+          <!-- Card Header -->
+          <div class="flex justify-between items-center border-b border-vault-cardBorder/80 pb-3">
+            <span class="text-xs font-mono font-bold text-slate-300">Pathology Report</span>
+            <span class="text-[11px] font-mono text-slate-400" id="reportTimestamp">generated --:--:-- UTC</span>
+          </div>
+
+          <!-- Report Container -->
+          <div class="flex-grow space-y-4">
+            
+            <!-- Primary Finding Banner Box -->
+            <div class="bg-slate-950 border border-vault-cardBorder rounded-xl p-4 flex justify-between items-center relative overflow-hidden">
+              <div class="space-y-1">
+                <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-500 bg-amber-950/80 px-2 py-0.5 rounded border border-amber-500/30">
+                  PRIMARY FINDING
+                </span>
+                <h2 class="text-2xl font-bold font-mono text-amber-400 mt-1" id="primaryFindingTitle">
+                  Awaiting Scan
+                </h2>
+                <p class="text-xs font-mono text-slate-400" id="coOccurringText">
+                  Upload image &amp; trigger analysis engine
+                </p>
+              </div>
+
+              <div class="text-right">
+                <div class="text-3xl font-extrabold font-mono text-amber-400" id="topConfidenceVal">--%</div>
+                <span class="text-[9px] font-mono text-slate-500 uppercase tracking-widest block mt-0.5">TOP CONFIDENCE</span>
+              </div>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="flex justify-between items-center pt-1">
+              <span class="text-xs font-mono text-slate-400 flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+                Thoracic Classes (14)
+              </span>
+
+              <div class="flex gap-1 bg-slate-950 p-1 rounded-lg text-[11px] font-mono border border-vault-cardBorder">
+                <button id="filterDetections" class="px-3 py-1 rounded bg-slate-800 text-sky-400 font-semibold shadow-xs transition-all">
+                  High Risk (≥50%)
+                </button>
+                <button id="filterAll" class="px-3 py-1 rounded text-slate-400 hover:text-slate-200 transition-all">
+                  All 14 Classes
+                </button>
+              </div>
+            </div>
+
+            <!-- Pathology List Container -->
+            <div id="pathologyList" class="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
+              <!-- Initial Placeholder Row Items -->
+              <div class="p-3 bg-slate-950/50 rounded-xl border border-slate-900 text-center text-xs font-mono text-slate-500">
+                No active scan loaded. Select an image on the left.
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-[#f2f4f6] w-full py-12 px-8">
-      <div
-        class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center max-w-screen-2xl mx-auto"
-      >
-        <div class="flex flex-col gap-4">
-          <div class="font-['Manrope'] font-bold text-[#001e40]">Vault AI</div>
-          <p class="font-['Inter'] text-sm tracking-wide text-[#57657a]">
-            © 2024 Vault AI. Advanced Medical Imaging Analysis.
-          </p>
+    <!-- Footer Information -->
+    <footer class="border-t border-vault-cardBorder/60 py-4 px-6 text-xs font-mono text-slate-400 mt-6">
+      <div class="max-w-screen-2xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+          <span>Vault Radiology System · PyTorch DenseNet121 Inference Engine</span>
         </div>
-        <div class="flex flex-wrap md:justify-end gap-x-8 gap-y-4">
-          <a
-            class="font-['Inter'] text-sm tracking-wide text-[#57657a] hover:underline"
-            href="#"
-            >Documentation</a
-          >
-          <a
-            class="font-['Inter'] text-sm tracking-wide text-[#57657a] hover:underline"
-            href="#"
-            >API Schema</a
-          >
+        <div class="flex items-center gap-4 text-[11px]">
+          <a href="/docs" target="_blank" class="hover:text-slate-200 transition-colors">FastAPI Docs (/docs)</a>
+          <a href="/health" target="_blank" class="hover:text-slate-200 transition-colors">Health API (/health)</a>
         </div>
       </div>
     </footer>
-  </body>
 
-  <script>
-    const API_URL = "http://127.0.0.1:5000";
+    <!-- Model Card Modal -->
+    <div id="modelCardModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="bg-vault-card border border-vault-cardBorder rounded-2xl max-w-xl w-full p-6 space-y-4 font-sans relative shadow-2xl">
+        <div class="flex justify-between items-center border-b border-vault-cardBorder pb-3">
+          <h3 class="text-base font-bold font-mono text-white flex items-center gap-2">
+            <span class="material-symbols-outlined text-sky-400">memory</span> DenseNet121 Model Specs
+          </h3>
+          <button id="closeModelCard" class="text-slate-400 hover:text-white font-mono text-sm">✕</button>
+        </div>
+        
+        <div class="space-y-3 text-xs text-slate-300 font-mono">
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-slate-950 p-3 rounded-lg border border-vault-cardBorder">
+              <span class="text-slate-500 block text-[10px]">ARCHITECTURE</span>
+              <strong class="text-sky-400 text-sm">DenseNet-121</strong>
+            </div>
+            <div class="bg-slate-950 p-3 rounded-lg border border-vault-cardBorder">
+              <span class="text-slate-500 block text-[10px]">PARAMETERS</span>
+              <strong class="text-white text-sm">~7.0M Weights</strong>
+            </div>
+            <div class="bg-slate-950 p-3 rounded-lg border border-vault-cardBorder">
+              <span class="text-slate-500 block text-[10px]">INPUT RESOLUTION</span>
+              <strong class="text-white text-sm">224 × 224 RGB</strong>
+            </div>
+            <div class="bg-slate-950 p-3 rounded-lg border border-vault-cardBorder">
+              <span class="text-slate-500 block text-[10px]">TRAINING DATASET</span>
+              <strong class="text-amber-400 text-sm">Stanford CheXpert</strong>
+            </div>
+          </div>
 
-    // CheXpert Upload Handler
-    const chexpertUploadArea = document.getElementById("chexpertUploadArea");
-    const chexpertFileInput = document.getElementById("chexpertFileInput");
-    const chexpertPredictionResult = document.getElementById(
-      "chexpertPredictionResult",
-    );
-    const chexpertPredictionText = document.getElementById(
-      "chexpertPredictionText",
-    );
-    const chexpertConfidenceText = document.getElementById(
-      "chexpertConfidenceText",
-    );
-    const chexpertConfidenceBar = document.getElementById(
-      "chexpertConfidenceBar",
-    );
-    const chexpertAllPredictions = document.getElementById(
-      "chexpertAllPredictions",
-    );
-    const chexpertPredictionTable = document.getElementById(
-      "chexpertPredictionTable",
-    );
+          <div class="bg-slate-950 p-3 rounded-lg border border-vault-cardBorder space-y-1">
+            <span class="text-slate-500 text-[10px] block font-bold">14 TARGET PATHOLOGY CLASSES</span>
+            <p class="text-[11px] text-slate-400 leading-relaxed">
+              Atelectasis, Cardiomegaly, Consolidation, Edema, Effusion, Emphysema, Fibrosis, Hernia, Infiltration, Nodule, Pleural Thickening, Pneumonia, Pneumothorax, No Finding.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    window.addEventListener("load", async () => {
-      try {
-        const response = await fetch(`${API_URL}/health`);
-        const data = await response.json();
-        console.log("Server connected:", data);
-      } catch (error) {
-        console.error("Cannot connect to server at " + API_URL);
-        console.error("Make sure Flask server is running: python cheXpert.py");
+    <!-- Case History Modal Drawer -->
+    <div id="caseHistoryModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="bg-vault-card border border-vault-cardBorder rounded-2xl max-w-2xl w-full p-6 space-y-4 font-sans relative shadow-2xl">
+        <div class="flex justify-between items-center border-b border-vault-cardBorder pb-3">
+          <h3 class="text-base font-bold font-mono text-white flex items-center gap-2">
+            <span class="material-symbols-outlined text-amber-400">history</span> Session Case History
+          </h3>
+          <button id="closeCaseHistory" class="text-slate-400 hover:text-white font-mono text-sm">✕</button>
+        </div>
+
+        <div id="historyListContainer" class="space-y-2 max-h-80 overflow-y-auto font-mono text-xs">
+          <!-- Dynamically populated from localStorage -->
+        </div>
+      </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+      const API_URL = window.location.protocol.startsWith('http') 
+        ? window.location.origin 
+        : 'http://127.0.0.1:8000';
+
+      let selectedFile = null;
+      let lastPrediction = null;
+      let activeFilter = 'detections'; // 'detections' or 'all'
+      const caseHistory = JSON.parse(localStorage.getItem('chexpert_history') || '[]');
+
+      // DOM Elements
+      const dropZoneArea = document.getElementById('dropZoneArea');
+      const fileInput = document.getElementById('fileInput');
+      const blankPrompt = document.getElementById('blankPrompt');
+      const xrayPreview = document.getElementById('xrayPreview');
+      const fileNameText = document.getElementById('fileNameText');
+      const fileDot = document.getElementById('fileDot');
+      const changeStudyBtn = document.getElementById('changeStudyBtn');
+      const runAnalysisBtn = document.getElementById('runAnalysisBtn');
+      const btnText = document.getElementById('btnText');
+      const btnIcon = document.getElementById('btnIcon');
+      const pathologyOverlay = document.getElementById('pathologyOverlay');
+      const overlayLabel = document.getElementById('overlayLabel');
+
+      const primaryFindingTitle = document.getElementById('primaryFindingTitle');
+      const topConfidenceVal = document.getElementById('topConfidenceVal');
+      const coOccurringText = document.getElementById('coOccurringText');
+      const reportTimestamp = document.getElementById('reportTimestamp');
+      const pathologyList = document.getElementById('pathologyList');
+
+      const filterDetections = document.getElementById('filterDetections');
+      const filterAll = document.getElementById('filterAll');
+
+      // Check Server Health
+      async function checkHealth() {
+        const dot = document.getElementById('serverDot');
+        const text = document.getElementById('serverText');
+        try {
+          const res = await fetch(`${API_URL}/health`);
+          if (res.ok) {
+            const data = await res.json();
+            dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+            text.textContent = data.model_loaded ? "DenseNet121 - Online" : "FastAPI Online (No Model)";
+          } else throw new Error();
+        } catch {
+          dot.className = "w-2 h-2 rounded-full bg-rose-500";
+          text.textContent = "Server Disconnected";
+        }
       }
-    });
+      checkHealth();
 
-    chexpertUploadArea.addEventListener("click", () =>
-      chexpertFileInput.click(),
-    );
+      // File Selection & Drag Drop
+      dropZoneArea.addEventListener('click', () => fileInput.click());
+      changeStudyBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        fileInput.click();
+      });
 
-    chexpertUploadArea.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      chexpertUploadArea.style.borderColor = "#001e40";
-      chexpertUploadArea.style.backgroundColor = "#f2f4f6";
-    });
+      dropZoneArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZoneArea.classList.add('border-sky-400');
+      });
+      dropZoneArea.addEventListener('dragleave', () => {
+        dropZoneArea.classList.remove('border-sky-400');
+      });
+      dropZoneArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZoneArea.classList.remove('border-sky-400');
+        if (e.dataTransfer.files.length > 0) {
+          handleFileSelect(e.dataTransfer.files[0]);
+        }
+      });
 
-    chexpertUploadArea.addEventListener("dragleave", () => {
-      chexpertUploadArea.style.borderColor = "";
-      chexpertUploadArea.style.backgroundColor = "";
-    });
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+          handleFileSelect(e.target.files[0]);
+        }
+      });
 
-    chexpertUploadArea.addEventListener("drop", (e) => {
-      e.preventDefault();
-      chexpertUploadArea.style.borderColor = "";
-      chexpertUploadArea.style.backgroundColor = "";
-      const files = e.dataTransfer.files;
-      if (files.length > 0) {
-        handleChexpertFileUpload(files[0]);
-      }
-    });
-
-    chexpertFileInput.addEventListener("change", (e) => {
-      if (e.target.files.length > 0) {
-        handleChexpertFileUpload(e.target.files[0]);
-      }
-    });
-
-    async function handleChexpertFileUpload(file) {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      try {
-        chexpertUploadArea.style.opacity = "0.5";
-        const response = await fetch(`${API_URL}/predict-chexpert-finetuned`, {
-          method: "POST",
-          body: formData,
+      // Sample presets handler
+      document.querySelectorAll('.sample-preset-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const sampleType = btn.getAttribute('data-sample');
+          loadSampleImage(sampleType);
         });
+      });
 
-        if (!response.ok) {
-          throw new Error(`Server error: ${response.status}`);
+      function loadSampleImage(type) {
+        // Create synthetic radiograph canvas sample
+        const canvas = document.createElement('canvas');
+        canvas.width = 224;
+        canvas.height = 224;
+        const ctx = canvas.getContext('2d');
+        
+        ctx.fillStyle = '#05070c';
+        ctx.fillRect(0, 0, 224, 224);
+        
+        // Draw radiograph chest structure representation
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath();
+        ctx.ellipse(80, 110, 35, 60, 0, 0, 2 * Math.PI);
+        ctx.ellipse(144, 110, 35, 60, 0, 0, 2 * Math.PI);
+        ctx.fill();
+
+        if (type === 'pneumonia') {
+          ctx.fillStyle = 'rgba(245, 158, 11, 0.4)';
+          ctx.beginPath();
+          ctx.arc(140, 130, 20, 0, 2 * Math.PI);
+          ctx.fill();
         }
 
-        const data = await response.json();
-        chexpertUploadArea.style.opacity = "1";
+        canvas.toBlob((blob) => {
+          const file = new File([blob], `${type}_sample.png`, { type: 'image/png' });
+          handleFileSelect(file);
+        });
+      }
 
-        if (data.error) {
-          chexpertPredictionText.textContent = "Error: " + data.error;
-          chexpertPredictionResult.style.display = "block";
-          chexpertAllPredictions.style.display = "none";
-        } else {
-          chexpertPredictionText.textContent = data.prediction;
-          const confidence = data.confidence * 100;
-          chexpertConfidenceText.textContent = `Top Class: ${data.top_class} | Confidence: ${confidence.toFixed(2)}%`;
-          chexpertConfidenceBar.style.width = confidence + "%";
+      function handleFileSelect(file) {
+        selectedFile = file;
+        fileNameText.textContent = file.name;
+        fileDot.className = "w-2 h-2 rounded-full bg-sky-400";
 
-          if (data.all_predictions && data.all_predictions.length > 0) {
-            chexpertPredictionTable.innerHTML = data.all_predictions
-              .map(
-                (pred) => `
-              <tr class="border-b">
-                <td class="px-4 py-2 text-on-surface">${pred.class}</td>
-                <td class="px-4 py-2 text-right font-semibold text-primary">${(pred.confidence * 100).toFixed(2)}%</td>
-              </tr>
-            `,
-              )
-              .join("");
-            chexpertAllPredictions.style.display = "block";
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          xrayPreview.src = e.target.result;
+          blankPrompt.classList.add('hidden');
+          xrayPreview.classList.remove('hidden');
+          pathologyOverlay.classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+
+        runAnalysisBtn.disabled = false;
+        btnText.textContent = "Run CheXpert Analysis";
+      }
+
+      // Execute Inference
+      runAnalysisBtn.addEventListener('click', async () => {
+        if (!selectedFile) return;
+
+        runAnalysisBtn.disabled = true;
+        btnText.textContent = "Computing DenseNet121 Scores...";
+        btnIcon.className = "material-symbols-outlined text-base animate-spin";
+
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+
+        try {
+          const res = await fetch(`${API_URL}/predict-chexpert-finetuned`, {
+            method: 'POST',
+            body: formData,
+          });
+
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.detail || `Server status ${res.status}`);
           }
 
-          chexpertPredictionResult.style.display = "block";
+          const data = await res.json();
+          lastPrediction = data;
+          
+          // Save to case history
+          caseHistory.unshift({
+            filename: selectedFile.name,
+            timestamp: new Date().toLocaleTimeString(),
+            top_class: data.top_class,
+            confidence: data.confidence
+          });
+          localStorage.setItem('chexpert_history', JSON.stringify(caseHistory.slice(0, 15)));
+
+          renderReport(data);
+        } catch (err) {
+          alert("Inference Error: " + err.message);
+        } finally {
+          runAnalysisBtn.disabled = false;
+          btnText.textContent = "Run CheXpert Analysis";
+          btnIcon.className = "material-symbols-outlined text-base";
         }
-      } catch (error) {
-        chexpertUploadArea.style.opacity = "1";
-        let errorMsg = error.message;
-        if (error.message.includes("Failed to fetch")) {
-          errorMsg =
-            "Cannot connect to server. Make sure Flask is running on " +
-            API_URL;
+      });
+
+      function renderReport(data) {
+        const topConfPct = (data.confidence * 100).toFixed(1);
+        primaryFindingTitle.textContent = data.top_class || "No Finding";
+        topConfidenceVal.textContent = `${topConfPct}%`;
+        
+        const timeNow = new Date().toISOString().slice(11, 19);
+        reportTimestamp.textContent = `generated ${timeNow} UTC`;
+
+        const coOccur = (data.all_predictions || [])
+          .filter(p => p.class !== data.top_class)
+          .map(p => p.class)
+          .slice(0, 2);
+
+        coOccurringText.textContent = coOccur.length > 0 
+          ? `Co-occurring: ${coOccur.join(', ')}` 
+          : 'Isolated pathology detection';
+
+        // Render Overlay Circle on preview image
+        if (data.confidence >= 0.5 && data.top_class !== 'No Finding') {
+          pathologyOverlay.classList.remove('hidden');
+          overlayLabel.textContent = `PRIMARY · ${data.top_class.slice(0, 3).toUpperCase()}`;
+        } else {
+          pathologyOverlay.classList.add('hidden');
         }
-        chexpertPredictionText.textContent = "Error: " + errorMsg;
-        chexpertPredictionResult.style.display = "block";
-        console.error("Upload error:", error);
+
+        renderPathologyList();
       }
-    }
-  </script>
+
+      // Render Segmented Meter List
+      filterDetections.addEventListener('click', () => {
+        activeFilter = 'detections';
+        filterDetections.className = "px-3 py-1 rounded bg-slate-800 text-sky-400 font-semibold shadow-xs transition-all";
+        filterAll.className = "px-3 py-1 rounded text-slate-400 hover:text-slate-200 transition-all";
+        renderPathologyList();
+      });
+
+      filterAll.addEventListener('click', () => {
+        activeFilter = 'all';
+        filterAll.className = "px-3 py-1 rounded bg-slate-800 text-sky-400 font-semibold shadow-xs transition-all";
+        filterDetections.className = "px-3 py-1 rounded text-slate-400 hover:text-slate-200 transition-all";
+        renderPathologyList();
+      });
+
+      function renderPathologyList() {
+        if (!lastPrediction) return;
+
+        const list = activeFilter === 'detections'
+          ? (lastPrediction.all_predictions || [])
+          : (lastPrediction.full_breakdown || []);
+
+        if (list.length === 0) {
+          pathologyList.innerHTML = `
+            <div class="p-4 text-center font-mono text-xs text-slate-500 bg-slate-950 rounded-xl border border-vault-cardBorder">
+              No pathologies detected above 50% probability threshold.
+            </div>
+          `;
+          return;
+        }
+
+        pathologyList.innerHTML = list.map((item, idx) => {
+          const confPct = (item.confidence * 100).toFixed(1);
+          const isHigh = item.confidence >= 0.50;
+          const numStr = String(idx + 1).padStart(2, '0');
+          
+          // Generate 20 LED segment blocks
+          const totalBlocks = 20;
+          const activeCount = Math.round((item.confidence) * totalBlocks);
+
+          let segmentsHtml = '';
+          for (let i = 0; i < totalBlocks; i++) {
+            let activeClass = '';
+            if (i < activeCount) {
+              if (item.confidence >= 0.50) activeClass = 'active-amber';
+              else if (item.confidence >= 0.30) activeClass = 'active-cyan';
+              else activeClass = 'active-muted';
+            }
+            segmentsHtml += `<div class="segment-block ${activeClass}"></div>`;
+          }
+
+          const scoreColor = isHigh ? 'text-amber-400 font-bold' : 'text-slate-400';
+
+          return `
+            <div class="p-2.5 bg-slate-950 rounded-xl border border-vault-cardBorder space-y-1.5">
+              <div class="flex justify-between items-center text-xs font-mono">
+                <span class="text-slate-300 font-semibold">
+                  <span class="text-slate-500 text-[10px] mr-1.5">${numStr}</span>
+                  ${item.class}
+                </span>
+                <span class="${scoreColor}">${confPct}%</span>
+              </div>
+              <div class="segmented-bar">
+                ${segmentsHtml}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Modals
+      const modelCardModal = document.getElementById('modelCardModal');
+      const navModelCard = document.getElementById('navModelCard');
+      const closeModelCard = document.getElementById('closeModelCard');
+
+      navModelCard.addEventListener('click', () => modelCardModal.classList.remove('hidden'));
+      closeModelCard.addEventListener('click', () => modelCardModal.classList.add('hidden'));
+
+      const caseHistoryModal = document.getElementById('caseHistoryModal');
+      const navCaseHistory = document.getElementById('navCaseHistory');
+      const closeCaseHistory = document.getElementById('closeCaseHistory');
+      const historyListContainer = document.getElementById('historyListContainer');
+
+      navCaseHistory.addEventListener('click', () => {
+        caseHistoryModal.classList.remove('hidden');
+        renderHistoryList();
+      });
+      closeCaseHistory.addEventListener('click', () => caseHistoryModal.classList.add('hidden'));
+
+      function renderHistoryList() {
+        const hist = JSON.parse(localStorage.getItem('chexpert_history') || '[]');
+        if (hist.length === 0) {
+          historyListContainer.innerHTML = `<div class="text-slate-500 text-center py-4">No past analysis history in session.</div>`;
+          return;
+        }
+
+        historyListContainer.innerHTML = hist.map(item => `
+          <div class="p-3 bg-slate-950 rounded-lg border border-vault-cardBorder flex justify-between items-center">
+            <div>
+              <span class="text-slate-200 font-bold">${item.filename}</span>
+              <span class="text-[10px] text-slate-500 block">${item.timestamp}</span>
+            </div>
+            <div class="text-right">
+              <span class="text-amber-400 font-bold">${item.top_class}</span>
+              <span class="text-[10px] text-slate-400 block">${(item.confidence * 100).toFixed(1)}%</span>
+            </div>
+          </div>
+        `).join('');
+      }
+    </script>
+  </body>
 </html>

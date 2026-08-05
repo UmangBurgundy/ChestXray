@@ -56,7 +56,7 @@ def load_model(model_path):
         return None
 
 # Initialize model
-MODEL_PATH = os.path.join(os.path.dirname(__file__), '..', 'model', 'chexpert_finetuned.pth')
+MODEL_PATH = os.path.join(os.path.dirname(__file__), '..', 'model', 'chexpert_finetuned_2nd.pth')
 if os.path.exists(MODEL_PATH):
     model = load_model(MODEL_PATH)
 else:

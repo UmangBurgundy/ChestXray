@@ -30,15 +30,15 @@ pip install -r requirements.txt
 
 ## Usage
 
-### Start the Backend Server
+### Start the FastAPI Backend Server
 
 ```bash
-python backend/cheXpert.py
+uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-The server runs on `http://localhost:5000`
+* **Web Application UI:** `http://127.0.0.1:8000/`
+* **Interactive API Documentation (Swagger):** `http://127.0.0.1:8000/docs`
 
-### API Endpoints
 
 #### POST /predict-chexpert-finetuned
 
@@ -85,14 +85,17 @@ Open `public/ChestXray.html` in your browser or serve via HTTP.
 ```
 prism_prj/
 ├── backend/
-│   └── cheXpert.py          # Flask app & model inference
+│   ├── main.py              # Primary FastAPI backend server
+│   ├── cheXpert.py          # Flask backend server (alternative)
+│   └── database.py          # Database configuration
+├── expo-app/                # React Native Expo mobile app
 ├── public/
-│   └── ChestXray.html       # Web interface
+│   └── ChestXray.html       # Primary Web UI interface
 ├── model/
-│   └── chexpert_finetuned.pth   # Pre-trained model weights
+│   └── chexpert_finetuned.pth   # Pre-trained model weights (Git ignored)
 ├── requirements.txt         # Python dependencies
 ├── .gitignore              # Git exclusions
-└── Readme.md               # This file
+└── Readme.md               # Project documentation
 ```
 
 ## Requirements
